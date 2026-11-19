@@ -64,8 +64,8 @@ if ($user['role'] === 'ketua_tim') {
 page_header('Ringkasan', 'dashboard', $user, $pendingCount);
 ?>
 <section class="welcome-banner">
-    <div><span class="eyebrow eyebrow-light">DASHBOARD</span><h2>Halo, <?= h(explode(' ', $user['name'])[0]) ?> <span class="wave">✦</span></h2><p><?= $user['role'] === 'pegawai' ? 'Pantau pengajuan izin dan ajukan kebutuhan izin Anda di sini.' : 'Berikut ringkasan aktivitas perizinan di kantor Anda.' ?></p></div>
-    <div class="welcome-decoration"><span>IK</span></div>
+    <div><span class="eyebrow eyebrow-light">DASHBOARD</span><h2>Halo, <?= h($user['name']) ?> <span class="wave">✦</span></h2><p><?= $user['role'] === 'pegawai' ? 'Pantau pengajuan izin dan ajukan kebutuhan izin Anda di sini.' : 'Berikut ringkasan aktivitas perizinan di kantor Anda.' ?></p></div>
+    <div class="welcome-decoration"></div>
 </section>
 
 <?php if ($user['role'] === 'pegawai'): ?>

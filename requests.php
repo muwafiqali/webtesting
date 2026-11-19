@@ -64,7 +64,7 @@ page_header('Pengajuan Izin', 'requests', $user, $pendingCount);
 
 <?php if ($user['role'] === 'pegawai'): ?>
 <section class="panel" id="buat-pengajuan">
-    <div class="panel-heading"><div><span class="eyebrow">FORMULIR</span><h2>Ajukan izin baru</h2></div><span class="form-step">01 <i>/</i> 02</span></div>
+    <div class="panel-heading"><div><span class="eyebrow">FORMULIR</span><h2>Ajukan izin baru</h2></div></div>
     <p class="muted form-hint">Pengajuan akan dikirim ke Ketua Tim Anda untuk diperiksa terlebih dahulu.</p>
     <form action="actions.php" method="post" class="request-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="create_request">
@@ -74,6 +74,8 @@ page_header('Pengajuan Izin', 'requests', $user, $pendingCount);
         <div class="form-row">
             <label>Tanggal mulai<input type="date" name="start_date" required></label>
             <label>Tanggal selesai<input type="date" name="end_date" required></label>
+            <label>Jam mulai<input type="text" name="start_time" placeholder="00:00" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]|24:00" maxlength="5" title="Gunakan format 00:00 sampai 24:00" required></label>
+            <label>Jam selesai<input type="text" name="end_time" placeholder="00:00" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]|24:00" maxlength="5" title="Gunakan format 00:00 sampai 24:00" required></label>
         </div>
         <label>Alasan pengajuan<textarea name="reason" minlength="15" maxlength="5000" rows="3" placeholder="Jelaskan alasan pengajuan izin Anda (minimal 15 karakter)" required></textarea></label>
         <div class="form-actions"><span class="muted">Pastikan tanggal dan informasi sudah benar.</span><button class="button button-primary" type="submit">Kirim pengajuan <span aria-hidden="true">→</span></button></div>
@@ -93,7 +95,7 @@ page_header('Pengajuan Izin', 'requests', $user, $pendingCount);
                     <div class="request-title"><span class="request-icon">▤</span><div><h3><?= h($request['type_name']) ?></h3><span><?= h($request['request_code']) ?><?php if ($user['role'] !== 'pegawai'): ?> · <?= h($request['employee_name']) ?> (<?= h($request['team_name'] ?? 'Tanpa tim') ?>)<?php endif; ?></span></div></div>
                     <span class="status-pill <?= h(status_class($request['status'])) ?>"><?= h(status_label($request['status'])) ?></span>
                 </div>
-                <div class="request-meta"><span><small>PERIODE</small><?= h(date_id($request['start_date'])) ?> – <?= h(date_id($request['end_date'])) ?></span><span><small>DIAJUKAN</small><?= h(date_id($request['created_at'])) ?></span></div>
+                <div class="request-meta"><span><small>PERIODE</small><?= h(date_id($request['start_date'])) ?> – <?= h(date_id($request['end_date'])) ?></span><span><small>JAM</small><?= h(time_id($request['start_time'])) ?> – <?= h(time_id($request['end_time'])) ?></span><span><small>DIAJUKAN</small><?= h(date_id($request['created_at'])) ?></span></div>
                 <p class="request-reason"><?= nl2br(h($request['reason'])) ?></p>
                 <?php if (!empty($logsByRequest[$request['id']])): ?>
                     <div class="timeline">
@@ -107,7 +109,12 @@ page_header('Pengajuan Izin', 'requests', $user, $pendingCount);
                         <form action="actions.php" method="post" class="request-form">
                             <?= csrf_field() ?><input type="hidden" name="action" value="resubmit_request"><input type="hidden" name="request_id" value="<?= (int) $request['id'] ?>">
                             <label>Jenis izin<select name="leave_type_id" required><?php foreach ($types as $type): ?><option value="<?= (int) $type['id'] ?>" <?= (int) $type['id'] === (int) $request['leave_type_id'] ? 'selected' : '' ?>><?= h($type['name']) ?></option><?php endforeach; ?></select></label>
-                            <div class="form-row"><label>Tanggal mulai<input type="date" name="start_date" value="<?= h($request['start_date']) ?>" required></label><label>Tanggal selesai<input type="date" name="end_date" value="<?= h($request['end_date']) ?>" required></label></div>
+                            <div class="form-row">
+                                <label>Tanggal mulai<input type="date" name="start_date" value="<?= h($request['start_date']) ?>" required></label>
+                                <label>Tanggal selesai<input type="date" name="end_date" value="<?= h($request['end_date']) ?>" required></label>
+                                <label>Jam mulai<input type="text" name="start_time" value="<?= h(time_id($request['start_time'])) ?>" placeholder="00:00" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]|24:00" maxlength="5" title="Gunakan format 00:00 sampai 24:00" required></label>
+                                <label>Jam selesai<input type="text" name="end_time" value="<?= h(time_id($request['end_time'])) ?>" placeholder="00:00" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]|24:00" maxlength="5" title="Gunakan format 00:00 sampai 24:00" required></label>
+                            </div>
                             <label>Alasan<textarea name="reason" minlength="15" maxlength="5000" rows="3" required><?= h($request['reason']) ?></textarea></label>
                             <button class="button button-primary" type="submit">Kirim perbaikan</button>
                         </form>

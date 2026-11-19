@@ -14,20 +14,33 @@ function valid_date(string $value): bool
     return $date !== false && $date->format('Y-m-d') === $value;
 }
 
+function valid_time(string $value): bool
+{
+    return preg_match('/^(?:(?:[01][0-9]|2[0-3]):[0-5][0-9]|24:00)$/', $value) === 1;
+}
+
 function validate_request_fields(): array
 {
     $typeId = filter_var($_POST['leave_type_id'] ?? null, FILTER_VALIDATE_INT);
     $startDate = trim((string) ($_POST['start_date'] ?? ''));
     $endDate = trim((string) ($_POST['end_date'] ?? ''));
+    $startTime = trim((string) ($_POST['start_time'] ?? ''));
+    $endTime = trim((string) ($_POST['end_time'] ?? ''));
     $reason = trim((string) ($_POST['reason'] ?? ''));
 
     if (!$typeId || !valid_date($startDate) || !valid_date($endDate) || $endDate < $startDate) {
         throw new InvalidArgumentException('Jenis izin dan rentang tanggal harus diisi dengan benar.');
     }
+    if (!valid_time($startTime) || !valid_time($endTime)) {
+        throw new InvalidArgumentException('Jam mulai dan selesai harus diisi dengan format 00:00 sampai 24:00.');
+    }
+    if ($startDate === $endDate && $endTime < $startTime) {
+        throw new InvalidArgumentException('Jam selesai tidak boleh lebih awal dari jam mulai pada tanggal yang sama.');
+    }
     if (strlen($reason) < 15 || strlen($reason) > 5000) {
         throw new InvalidArgumentException('Alasan izin harus berisi 15–5.000 karakter.');
     }
-    return [$typeId, $startDate, $endDate, $reason];
+    return [$typeId, $startDate, $endDate, $startTime, $endTime, $reason];
 }
 
 function ensure_no_overlap(PDO $pdo, int $userId, string $startDate, string $endDate, ?int $excludeId = null): void
@@ -55,7 +68,7 @@ try {
         if ($user['role'] !== 'pegawai') {
             throw new InvalidArgumentException('Hanya pegawai yang dapat membuat pengajuan izin.');
         }
-        [$typeId, $startDate, $endDate, $reason] = validate_request_fields();
+        [$typeId, $startDate, $endDate, $startTime, $endTime, $reason] = validate_request_fields();
         $typeCheck = $pdo->prepare('SELECT id FROM leave_types WHERE id = ? AND is_active = 1');
         $typeCheck->execute([$typeId]);
         if (!$typeCheck->fetchColumn()) {
@@ -64,10 +77,10 @@ try {
         ensure_no_overlap($pdo, (int) $user['id'], $startDate, $endDate);
         $code = 'IZ-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
         $statement = $pdo->prepare(
-            "INSERT INTO leave_requests (request_code, user_id, leave_type_id, start_date, end_date, reason, status)
-             VALUES (?, ?, ?, ?, ?, ?, 'awaiting_team')"
+            "INSERT INTO leave_requests (request_code, user_id, leave_type_id, start_date, end_date, start_time, end_time, reason, status)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'awaiting_team')"
         );
-        $statement->execute([$code, $user['id'], $typeId, $startDate, $endDate, $reason]);
+        $statement->execute([$code, $user['id'], $typeId, $startDate, $endDate, $startTime, $endTime, $reason]);
         flash('success', 'Pengajuan izin berhasil dikirim ke Ketua Tim.');
         redirect('requests.php');
     }
@@ -80,7 +93,7 @@ try {
         if (!$requestId) {
             throw new InvalidArgumentException('Pengajuan tidak valid.');
         }
-        [$typeId, $startDate, $endDate, $reason] = validate_request_fields();
+        [$typeId, $startDate, $endDate, $startTime, $endTime, $reason] = validate_request_fields();
         $typeCheck = $pdo->prepare('SELECT id FROM leave_types WHERE id = ? AND is_active = 1');
         $typeCheck->execute([$typeId]);
         if (!$typeCheck->fetchColumn()) {
@@ -96,10 +109,10 @@ try {
         ensure_no_overlap($pdo, (int) $user['id'], $startDate, $endDate, (int) $requestId);
         $statement = $pdo->prepare(
             "UPDATE leave_requests
-             SET leave_type_id = ?, start_date = ?, end_date = ?, reason = ?, status = 'awaiting_team'
+             SET leave_type_id = ?, start_date = ?, end_date = ?, start_time = ?, end_time = ?, reason = ?, status = 'awaiting_team'
              WHERE id = ? AND user_id = ? AND status = 'revision'"
         );
-        $statement->execute([$typeId, $startDate, $endDate, $reason, $requestId, $user['id']]);
+        $statement->execute([$typeId, $startDate, $endDate, $startTime, $endTime, $reason, $requestId, $user['id']]);
         if ($statement->rowCount() !== 1) {
             throw new InvalidArgumentException('Pengajuan berubah. Muat ulang halaman lalu coba kembali.');
         }

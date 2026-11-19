@@ -1,0 +1,216 @@
+/* Styles khusus halaman dashboard */
+
+.welcome-banner {
+    position: relative;
+    overflow: hidden;
+    min-height: 165px;
+    border-radius: 14px;
+    padding: 26px 30px;
+    background: linear-gradient(112deg,#183d98,#285fd2 66%,#3677de);
+    color: #fff;
+    box-shadow: 0 12px 28px #2459d326;
+}
+
+.welcome-banner .eyebrow {
+    color: #c1d5ff;
+}
+
+.welcome-banner h2 {
+    margin: 8px 0 4px;
+    font-size: 23px;
+    letter-spacing: -.7px;
+}
+
+.welcome-banner p {
+    margin: 0;
+    color: #d4e0fa;
+    font-size: 12px;
+}
+
+.wave {
+    font-size: 16px;
+    color: #ffdb8d;
+}
+
+.welcome-decoration {
+    position: absolute;
+    right: 75px;
+    top: -37px;
+    width: 232px;
+    height: 232px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: 1px solid #ffffff27;
+    background: radial-gradient(circle,#ffffff1b,transparent 65%);
+}
+
+.welcome-decoration:before,.welcome-decoration:after {
+    content: "";
+    position: absolute;
+    inset: 22px;
+    border: 1px solid #ffffff1e;
+    border-radius: 50%;
+}
+
+.welcome-decoration:after {
+    inset: 48px;
+}
+
+.icon-blue {
+    color: #3265d0;
+    background: #edf3ff;
+}
+
+.icon-amber {
+    color: #bf811d;
+    background: #fff6e5;
+}
+
+.icon-green {
+    color: #17845e;
+    background: #e7f7f0;
+}
+
+.icon-red {
+    color: #c24858;
+    background: #fff0f2;
+}
+
+.icon-purple {
+    color: #7558bf;
+    background: #f2effc;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.stat-card {
+    position: relative;
+    min-height: 111px;
+    padding: 17px 16px 13px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    box-shadow: var(--shadow);
+}
+
+.stat-card>div {
+    display: flex;
+    flex-direction: column;
+    margin-left: 44px;
+    gap: 2px;
+}
+
+.stat-card>div span {
+    color: #7b899d;
+    font-size: 11px;
+}
+
+.stat-card>div strong {
+    font-size: 23px;
+    line-height: 1.2;
+    letter-spacing: -.7px;
+}
+
+.stat-card>small {
+    display: block;
+    margin-top: 11px;
+    color: #9aa5b5;
+    font-size: 10px;
+}
+
+.stat-icon {
+    position: absolute;
+    left: 15px;
+    top: 17px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.floating-cta {
+    position: fixed;
+    bottom: 25px;
+    right: 28px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 16px;
+    border-radius: 30px;
+    background: var(--blue);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 7px 23px #2459d34a;
+    z-index: 3;
+}
+
+.floating-cta span {
+    font-size: 18px;
+    line-height: 1;
+}
+
+@media (max-width: 1100px) {
+    .stats-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .welcome-banner {
+        padding: 23px 20px;
+        min-height: 145px;
+    }
+
+    .welcome-banner h2 {
+        font-size: 20px;
+    }
+
+    .welcome-decoration {
+        right: -85px;
+        opacity: .7;
+    }
+
+    .stats-grid {
+        gap: 9px;
+        margin: 13px 0;
+    }
+
+    .stat-card {
+        min-height: 102px;
+        padding: 14px 10px;
+    }
+
+    .stat-card>div {
+        margin-left: 39px;
+    }
+
+    .stat-card>div strong {
+        font-size: 20px;
+    }
+
+    .stat-card>small {
+        font-size: 9px;
+    }
+
+    .stat-icon {
+        left: 10px;
+        top: 14px;
+        width: 29px;
+        height: 29px;
+    }
+
+    .floating-cta {
+        right: 15px;
+        bottom: 15px;
+    }
+}

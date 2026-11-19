@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(60) NOT NULL UNIQUE,
     email VARCHAR(190) NOT NULL UNIQUE,
     nip VARCHAR(30) NULL UNIQUE,
+    address VARCHAR(500) NULL,
     password_hash VARCHAR(255) NOT NULL,
     role ENUM('admin', 'kepala', 'ketua_tim', 'pegawai') NOT NULL,
     team_id INT UNSIGNED NULL,
@@ -39,6 +40,8 @@ CREATE TABLE IF NOT EXISTS leave_requests (
     leave_type_id INT UNSIGNED NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
+    start_time TIME NOT NULL DEFAULT '00:00:00',
+    end_time TIME NOT NULL DEFAULT '00:00:00',
     reason TEXT NOT NULL,
     status ENUM('awaiting_team', 'awaiting_head', 'revision', 'approved', 'rejected')
         NOT NULL DEFAULT 'awaiting_team',

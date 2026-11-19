@@ -1,0 +1,208 @@
+/* Styles khusus halaman persetujuan */
+
+.approval-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.approval-list {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 16px;
+}
+
+.approval-card {
+    margin: 0;
+    padding: 19px;
+}
+
+.employee-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0 14px;
+}
+
+.employee-summary strong {
+    display: block;
+    font-size: 11px;
+}
+
+.employee-summary small {
+    display: block;
+    color: #8b98aa;
+    font-size: 9px;
+    margin-top: 2px;
+}
+
+.approval-details {
+    display: flex;
+    gap: 34px;
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.approval-details small {
+    display: block;
+    color: #a0aaba;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.approval-details strong {
+    font-size: 10px;
+    color: #52617a;
+}
+
+.reason-box {
+    padding: 12px 0 4px;
+}
+
+.reason-box>small {
+    display: block;
+    color: #a0aaba;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.reason-box p {
+    margin: 0;
+    color: #68768a;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.review-form {
+    margin-top: 12px;
+    padding-top: 13px;
+    border-top: 1px dashed #e1e6ee;
+}
+
+.review-form label {
+    display: grid;
+    gap: 6px;
+    color: #46556b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.review-form label .muted {
+    font-weight: 400;
+    font-size: 9px;
+}
+
+.review-form textarea {
+    width: 100%;
+    resize: vertical;
+    min-height: 76px;
+    padding: 10px 11px;
+    border: 1px solid #dfe5ee;
+    border-radius: 7px;
+}
+
+.review-form textarea:focus {
+    border-color: #7196ed;
+    box-shadow: 0 0 0 3px #2459d313;
+    outline: none;
+}
+
+.review-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 7px;
+    margin-top: 11px;
+}
+
+.review-actions .button {
+    min-height: 34px;
+    padding: 0 11px;
+    font-size: 10px;
+}
+
+.approval-confirm-dialog {
+    width: min(420px,calc(100% - 32px));
+    padding: 30px;
+    text-align: center;
+}
+
+.approval-confirm-dialog::backdrop {
+    background: rgba(23,43,77,.58);
+    backdrop-filter: blur(3px);
+}
+
+.approval-confirm-icon {
+    width: 54px;
+    height: 54px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 17px;
+    border-radius: 17px;
+    background: #e8f7ef;
+    color: #168054;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.approval-confirm-dialog h2 {
+    margin: 7px 0;
+    color: #263a57;
+    font-size: 19px;
+    letter-spacing: -.4px;
+}
+
+.approval-confirm-summary {
+    margin: 0;
+    color: #75839a;
+    font-size: 12px;
+    line-height: 1.65;
+}
+
+.approval-confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 24px;
+}
+
+.approval-confirm-actions .button {
+    min-width: 128px;
+}
+
+@media (max-width: 1100px) {
+    .approval-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .review-actions {
+        flex-wrap: wrap;
+    }
+
+    .review-actions .button {
+        flex: 1;
+    }
+
+    .approval-details {
+        gap: 15px;
+    }
+
+    .approval-confirm-dialog {
+        padding: 24px 20px;
+    }
+
+    .approval-confirm-actions {
+        flex-direction: column-reverse;
+    }
+
+    .approval-confirm-actions .button {
+        width: 100%;
+    }
+}

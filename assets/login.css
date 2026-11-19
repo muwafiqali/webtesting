@@ -1,0 +1,142 @@
+/* Styles khusus halaman login */
+
+.login-page {
+    background: #fff;
+}
+
+.login-layout {
+    display: grid;
+}
+
+.login-visual {
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    padding: 37px 8%;
+    background: linear-gradient(145deg,#183777,#1c4ba7 58%,#2863c5);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-on-dark {
+    position: relative;
+    z-index: 2;
+}
+
+.login-card {
+    width: min(100%,50%);
+    position: relative;
+    margin: auto;
+    padding: 30px 28px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: var(--shadow);
+}
+
+.login-card>.eyebrow {
+    margin-bottom: 8px;
+    color: #4f74bd;
+}
+
+.login-card h2 {
+    font-size: 24px;
+    letter-spacing: -.8px;
+    margin: 0;
+}
+
+.login-card>.muted {
+    margin: 6px 0 25px;
+}
+
+.form-stack {
+    display: grid;
+    gap: 16px;
+}
+
+.form-stack label {
+    font-size: 11px;
+}
+
+.form-stack input {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 11px;
+    border: 1px solid #dfe5ee;
+    border-radius: 7px;
+    background: #fff;
+    color: #2d3e58;
+    font-size: 12px;
+    outline: none;
+}
+
+.form-stack input:focus {
+    border-color: #7196ed;
+    box-shadow: 0 0 0 3px #2459d313;
+}
+
+.form-stack .button {
+    margin-top: 3px;
+    min-height: 45px;
+}
+
+.login-demo {
+    margin-top: 25px;
+    padding: 13px 14px;
+    border-radius: 8px;
+    background: #f5f8fd;
+    border: 1px solid #e8edf5;
+}
+
+.login-demo strong {
+    font-size: 10px;
+}
+
+.login-demo p {
+    margin: 5px 0;
+    color: #66758b;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.login-demo small {
+    color: #8693a7;
+    font-size: 9px;
+}
+
+.login-demo code {
+    padding: 2px 5px;
+    background: #e8eef9;
+    border-radius: 4px;
+    color: #315bb2;
+}
+
+.login-caption {
+    text-align: center;
+    margin: 20px 0 0;
+    color: #a0aaba;
+    font-size: 9px;
+}
+
+.login-mobile-brand {
+    display: none;
+}
+
+@media (max-width: 760px) {
+    .login-layout {
+        display: block;
+    }
+
+    .login-visual {
+        display: none;
+    }
+
+    .login-mobile-brand {
+        display: flex;
+        margin-bottom: 42px;
+    }
+
+    .login-card h2 {
+        font-size: 22px;
+    }
+}

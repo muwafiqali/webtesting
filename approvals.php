@@ -42,15 +42,25 @@ page_header('Persetujuan', 'approvals', $user, $pendingCount);
         <article class="panel approval-card">
             <div class="approval-card-head"><div class="request-title"><span class="request-icon">▤</span><div><h2><?= h($request['type_name']) ?></h2><span><?= h($request['request_code']) ?></span></div></div><span class="status-pill status-waiting">Perlu ditinjau</span></div>
             <div class="employee-summary"><span class="avatar"><?= h(substr($request['employee_name'], 0, 1)) ?></span><div><strong><?= h($request['employee_name']) ?></strong><small>NIP <?= h($request['nip'] ?: '-') ?> · <?= h($request['team_name'] ?? 'Tanpa tim') ?></small></div></div>
-            <div class="approval-details"><div><small>PERIODE IZIN</small><strong><?= h(date_id($request['start_date'])) ?> – <?= h(date_id($request['end_date'])) ?></strong></div><div><small>TANGGAL PENGAJUAN</small><strong><?= h(date_id($request['created_at'])) ?></strong></div></div>
+            <div class="approval-details"><div><small>PERIODE IZIN</small><strong><?= h(date_id($request['start_date'])) ?> – <?= h(date_id($request['end_date'])) ?></strong></div><div><small>JAM IZIN</small><strong><?= h(time_id($request['start_time'])) ?> – <?= h(time_id($request['end_time'])) ?></strong></div><div><small>TANGGAL PENGAJUAN</small><strong><?= h(date_id($request['created_at'])) ?></strong></div></div>
             <div class="reason-box"><small>ALASAN PEGAWAI</small><p><?= nl2br(h($request['reason'])) ?></p></div>
             <form action="actions.php" method="post" class="review-form">
                 <?= csrf_field() ?><input type="hidden" name="action" value="review_request"><input type="hidden" name="request_id" value="<?= (int) $request['id'] ?>">
                 <label>Catatan keputusan <span class="muted">(wajib untuk menolak atau meminta perbaikan)</span><textarea name="note" rows="2" maxlength="1000" placeholder="Tambahkan catatan untuk pegawai"></textarea></label>
-                <div class="review-actions"><button class="button button-danger-outline" type="submit" name="decision" value="rejected" onclick="return confirm('Tolak pengajuan ini?')">Tolak</button><button class="button button-outline" type="submit" name="decision" value="revision">Minta perbaikan</button><button class="button button-primary" type="submit" name="decision" value="approved" onclick="return confirm('Setujui pengajuan ini?')">Setujui <span aria-hidden="true">→</span></button></div>
+                <div class="review-actions"><button class="button button-danger-outline" type="submit" name="decision" value="rejected" onclick="return confirm('Tolak pengajuan ini?')">Tolak</button><button class="button button-outline" type="submit" name="decision" value="revision">Minta perbaikan</button><button class="button button-primary" type="submit" name="decision" value="approved" data-approval-confirm>Setujui <span aria-hidden="true">→</span></button></div>
             </form>
         </article>
     <?php endforeach; ?>
     </div>
 <?php endif; ?>
+<dialog class="app-dialog approval-confirm-dialog" id="approval-confirm-dialog" aria-labelledby="approval-confirm-title">
+    <div class="approval-confirm-icon" aria-hidden="true">✓</div>
+    <span class="eyebrow">KONFIRMASI PERSETUJUAN</span>
+    <h2 id="approval-confirm-title">Setujui pengajuan ini?</h2>
+    <p class="approval-confirm-summary" data-approval-summary>Pastikan informasi pengajuan sudah diperiksa sebelum melanjutkan.</p>
+    <div class="approval-confirm-actions">
+        <button class="button button-outline" type="button" data-dialog-close>Kembali</button>
+        <button class="button button-primary" type="button" data-approval-confirm-submit>Ya, setujui</button>
+    </div>
+</dialog>
 <?php page_footer(); ?>

@@ -47,7 +47,7 @@ function current_user(): ?array
     }
 
     $statement = db()->prepare(
-        'SELECT u.id, u.name, u.username, u.email, u.nip, u.role, u.team_id,
+        'SELECT u.id, u.name, u.username, u.email, u.nip, u.address, u.role, u.team_id,
                 t.name AS team_name
          FROM users u LEFT JOIN teams t ON t.id = u.team_id
          WHERE u.id = ? AND u.is_active = 1'
@@ -140,6 +140,11 @@ function date_id(?string $date): string
     return date('d', $timestamp) . ' ' . $months[(int) date('n', $timestamp)] . ' ' . date('Y', $timestamp);
 }
 
+function time_id(?string $time): string
+{
+    return $time ? substr($time, 0, 5) : '-';
+}
+
 function date_long(): string
 {
     $days = [1 => 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
@@ -153,6 +158,7 @@ function page_header(string $title, string $active, array $user, int $pendingCou
     $menus = [
         ['dashboard.php', 'Ringkasan', '⌂', 'dashboard'],
         ['requests.php', 'Pengajuan Izin', '▤', 'requests'],
+        ['profile.php', 'Profil Saya', '◉', 'profile'],
     ];
     if (in_array($user['role'], ['ketua_tim', 'kepala'], true)) {
         $menus[] = ['approvals.php', 'Persetujuan', '✓', 'approvals'];
@@ -167,12 +173,33 @@ function page_header(string $title, string $active, array $user, int $pendingCou
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title><?= h($title) ?> · IzinKantor</title>
-        <link rel="stylesheet" href="assets/style.css">
+        <link rel="icon" href="assets/logo.png" type="image/png">
+        <link rel="stylesheet" href="assets/app.css?v=<?= (int) filemtime(__DIR__ . '/assets/app.css') ?>">
+        <?php
+        $pageStyles = [
+            'dashboard' => 'dashboard.css',
+            'requests' => 'requests.css',
+            'approvals' => 'approvals.css',
+            'users' => 'users.css',
+            'profile' => 'profile.css',
+        ];
+        if (isset($pageStyles[$active])): ?>
+            <link rel="stylesheet" href="assets/<?= h($pageStyles[$active]) ?>?v=<?= (int) filemtime(__DIR__ . '/assets/' . $pageStyles[$active]) ?>">
+        <?php endif; ?>
+        <?php if (in_array($active, ['profile', 'users'], true)): ?>
+            <script src="assets/dialog.js?v=<?= (int) filemtime(__DIR__ . '/assets/dialog.js') ?>" defer></script>
+        <?php endif; ?>
+        <?php if ($active === 'users'): ?>
+            <script src="assets/custom-select.js?v=<?= (int) filemtime(__DIR__ . '/assets/custom-select.js') ?>" defer></script>
+        <?php endif; ?>
+        <?php if ($active === 'approvals'): ?>
+            <script src="assets/approvals.js?v=<?= (int) filemtime(__DIR__ . '/assets/approvals.js') ?>" defer></script>
+        <?php endif; ?>
     </head>
     <body>
     <div class="app-shell">
         <aside class="sidebar">
-            <a class="brand" href="dashboard.php"><span class="brand-mark">IK</span><span>Izin<span class="brand-light">Kantor</span><small>PORTAL LAYANAN PEGAWAI</small></span></a>
+            <a class="brand" href="dashboard.php"><img class="brand-logo" src="assets/logo.png" alt="Logo SEMESTA"></a>
             <div class="sidebar-label">MENU UTAMA</div>
             <nav class="side-nav">
                 <?php foreach ($menus as [$href, $label, $icon, $key]): ?>
@@ -225,7 +252,7 @@ function request_table(array $requests, bool $showEmployee = false): void
                     <tr>
                         <td><strong><?= h($request['type_name']) ?></strong><small class="table-sub"><?= h($request['request_code']) ?></small></td>
                         <?php if ($showEmployee): ?><td><?= h($request['employee_name']) ?><small class="table-sub"><?= h($request['team_name'] ?? 'Tanpa tim') ?></small></td><?php endif; ?>
-                        <td><?= h(date_id($request['start_date'])) ?> – <?= h(date_id($request['end_date'])) ?></td>
+                        <td><?= h(date_id($request['start_date'])) ?> – <?= h(date_id($request['end_date'])) ?><small class="table-sub"><?= h(time_id($request['start_time'])) ?> – <?= h(time_id($request['end_time'])) ?></small></td>
                         <td><?= h(date_id($request['created_at'])) ?></td>
                         <td><span class="status-pill <?= h(status_class($request['status'])) ?>"><?= h(status_label($request['status'])) ?></span></td>
                         <td><a class="text-link" href="requests.php#request-<?= (int) $request['id'] ?>">Detail <span aria-hidden="true">→</span></a></td>
