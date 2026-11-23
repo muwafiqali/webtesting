@@ -74,8 +74,8 @@ page_header('Pengajuan Izin', 'requests', $user, $pendingCount);
         <div class="form-row">
             <label>Tanggal mulai<input type="date" name="start_date" required></label>
             <label>Tanggal selesai<input type="date" name="end_date" required></label>
-            <label>Jam mulai<input type="text" name="start_time" placeholder="00:00" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]|24:00" maxlength="5" title="Gunakan format 00:00 sampai 24:00" required></label>
-            <label>Jam selesai<input type="text" name="end_time" placeholder="00:00" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]|24:00" maxlength="5" title="Gunakan format 00:00 sampai 24:00" required></label>
+            <?php time_picker('start', 'Jam mulai', null, 'new-start'); ?>
+            <?php time_picker('end', 'Jam selesai', null, 'new-end'); ?>
         </div>
         <label>Alasan pengajuan<textarea name="reason" minlength="15" maxlength="5000" rows="3" placeholder="Jelaskan alasan pengajuan izin Anda (minimal 15 karakter)" required></textarea></label>
         <div class="form-actions"><span class="muted">Pastikan tanggal dan informasi sudah benar.</span><button class="button button-primary" type="submit">Kirim pengajuan <span aria-hidden="true">→</span></button></div>
@@ -112,8 +112,8 @@ page_header('Pengajuan Izin', 'requests', $user, $pendingCount);
                             <div class="form-row">
                                 <label>Tanggal mulai<input type="date" name="start_date" value="<?= h($request['start_date']) ?>" required></label>
                                 <label>Tanggal selesai<input type="date" name="end_date" value="<?= h($request['end_date']) ?>" required></label>
-                                <label>Jam mulai<input type="text" name="start_time" value="<?= h(time_id($request['start_time'])) ?>" placeholder="00:00" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]|24:00" maxlength="5" title="Gunakan format 00:00 sampai 24:00" required></label>
-                                <label>Jam selesai<input type="text" name="end_time" value="<?= h(time_id($request['end_time'])) ?>" placeholder="00:00" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]|24:00" maxlength="5" title="Gunakan format 00:00 sampai 24:00" required></label>
+                                <?php time_picker('start', 'Jam mulai', (string) $request['start_time'], 'revision-' . (int) $request['id'] . '-start'); ?>
+                                <?php time_picker('end', 'Jam selesai', (string) $request['end_time'], 'revision-' . (int) $request['id'] . '-end'); ?>
                             </div>
                             <label>Alasan<textarea name="reason" minlength="15" maxlength="5000" rows="3" required><?= h($request['reason']) ?></textarea></label>
                             <button class="button button-primary" type="submit">Kirim perbaikan</button>

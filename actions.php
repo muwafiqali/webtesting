@@ -24,8 +24,12 @@ function validate_request_fields(): array
     $typeId = filter_var($_POST['leave_type_id'] ?? null, FILTER_VALIDATE_INT);
     $startDate = trim((string) ($_POST['start_date'] ?? ''));
     $endDate = trim((string) ($_POST['end_date'] ?? ''));
-    $startTime = trim((string) ($_POST['start_time'] ?? ''));
-    $endTime = trim((string) ($_POST['end_time'] ?? ''));
+    $startTime = array_key_exists('start_time', $_POST)
+        ? trim((string) $_POST['start_time'])
+        : trim((string) ($_POST['start_hour'] ?? '')) . ':' . trim((string) ($_POST['start_minute'] ?? ''));
+    $endTime = array_key_exists('end_time', $_POST)
+        ? trim((string) $_POST['end_time'])
+        : trim((string) ($_POST['end_hour'] ?? '')) . ':' . trim((string) ($_POST['end_minute'] ?? ''));
     $reason = trim((string) ($_POST['reason'] ?? ''));
 
     if (!$typeId || !valid_date($startDate) || !valid_date($endDate) || $endDate < $startDate) {

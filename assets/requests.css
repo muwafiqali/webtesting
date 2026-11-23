@@ -15,6 +15,245 @@
     margin: -7px 0 17px;
 }
 
+.time-picker-field {
+    position: relative;
+    display: grid;
+    gap: 6px;
+    color: #46556b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.time-picker-label {
+    display: block;
+}
+
+.time-picker-trigger {
+    display: grid;
+    width: 100%;
+    min-height: 52px;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 12px;
+    border: 1px solid #dfe5ee;
+    border-radius: 9px;
+    background: #fff;
+    color: #2d3e58;
+    font: inherit;
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .16s, box-shadow .16s, background .16s;
+}
+
+.time-picker-trigger:hover {
+    border-color: #c6d3ec;
+    background: #fcfdff;
+}
+
+.time-picker-trigger:focus-visible {
+    border-color: #7196ed;
+    box-shadow: 0 0 0 3px #2459d313;
+    outline: none;
+}
+
+.time-picker-trigger[aria-invalid="true"] {
+    border-color: #c13c4b;
+}
+
+.time-picker-icon {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: #edf3ff;
+    color: var(--blue);
+    font-size: 17px;
+}
+
+.time-picker-value {
+    color: #263a57;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .3px;
+}
+
+.time-picker-trigger[data-empty="true"] .time-picker-value {
+    color: #9aa5b5;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+.time-picker-arrow {
+    color: #8390a3;
+    font-size: 16px;
+}
+
+.time-picker-panel {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    z-index: 20;
+    width: min(310px, calc(100vw - 48px));
+    padding: 15px;
+    border: 1px solid #e1e7f0;
+    border-radius: 11px;
+    background: #fff;
+    box-shadow: 0 16px 36px #172b4d29;
+}
+
+.time-picker-panel[hidden] {
+    display: none;
+}
+
+.time-picker-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.time-picker-panel-heading strong {
+    display: block;
+    margin-top: 2px;
+    color: #34445f;
+    font-size: 13px;
+}
+
+.time-picker-panel-kicker {
+    color: #8a97aa;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.time-picker-preview {
+    padding: 6px 9px;
+    border-radius: 7px;
+    background: #edf3ff;
+    color: var(--blue);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .4px;
+}
+
+.time-picker-heading-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.time-picker-close {
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 7px;
+    background: #f1f4f9;
+    color: #748097;
+    font-size: 19px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.time-picker-close:hover {
+    background: #e8edf5;
+    color: #34445f;
+}
+
+.time-picker-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.time-picker-choice {
+    display: grid;
+    align-content: start;
+    gap: 7px;
+    color: #75839a;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .4px;
+}
+
+.time-picker-options {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-height: 190px;
+    overflow-y: auto;
+    padding: 4px;
+    border: 1px solid #edf0f5;
+    border-radius: 8px;
+    background: #f8fafd;
+    scrollbar-color: #c7d2e3 transparent;
+    scrollbar-width: thin;
+}
+
+.time-picker-option {
+    flex: 0 0 30px;
+    width: 100%;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: #52617a;
+    font: 600 10px "DM Sans", sans-serif;
+    cursor: pointer;
+}
+
+.time-picker-option:hover,
+.time-picker-option:focus-visible {
+    background: #e8efff;
+    color: var(--blue);
+    outline: none;
+}
+
+.time-picker-option[aria-selected="true"] {
+    background: var(--blue);
+    color: #fff;
+    box-shadow: 0 3px 8px #2459d333;
+}
+
+.time-picker-option:disabled {
+    color: #c2cad6;
+    cursor: not-allowed;
+}
+
+.time-picker-option:disabled:hover {
+    background: transparent;
+    color: #c2cad6;
+}
+
+.time-picker-error {
+    margin-top: 1px;
+    color: #b83445;
+    font-size: 10px;
+}
+
+.time-picker-error[hidden] {
+    display: none;
+}
+
+@media (max-width: 520px) {
+    .time-picker-panel {
+        width: min(310px, calc(100vw - 40px));
+        padding: 12px;
+    }
+
+    .time-picker-columns {
+        gap: 7px;
+    }
+
+    .time-picker-options {
+        max-height: 175px;
+    }
+}
+
 .heading-count {
     display: inline-flex;
     vertical-align: middle;

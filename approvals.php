@@ -47,12 +47,17 @@ page_header('Persetujuan', 'approvals', $user, $pendingCount);
             <form action="actions.php" method="post" class="review-form">
                 <?= csrf_field() ?><input type="hidden" name="action" value="review_request"><input type="hidden" name="request_id" value="<?= (int) $request['id'] ?>">
                 <label>Catatan keputusan <span class="muted">(wajib untuk menolak atau meminta perbaikan)</span><textarea name="note" rows="2" maxlength="1000" placeholder="Tambahkan catatan untuk pegawai"></textarea></label>
-                <div class="review-actions"><button class="button button-danger-outline" type="submit" name="decision" value="rejected" onclick="return confirm('Tolak pengajuan ini?')">Tolak</button><button class="button button-outline" type="submit" name="decision" value="revision">Minta perbaikan</button><button class="button button-primary" type="submit" name="decision" value="approved" data-approval-confirm>Setujui <span aria-hidden="true">→</span></button></div>
+                <div class="review-actions">
+                    <button class="button button-danger-outline" type="submit" name="decision" value="rejected">Tolak</button>
+                    <button class="button button-outline" type="submit" name="decision" value="revision">Minta perbaikan</button>
+                    <button class="button button-primary" type="submit" name="decision" value="approved"<?php if ($user['role'] === 'kepala'): ?> data-approval-confirm<?php endif; ?>>Setujui <span aria-hidden="true">→</span></button>
+                </div>
             </form>
         </article>
     <?php endforeach; ?>
     </div>
 <?php endif; ?>
+<?php if ($user['role'] === 'kepala'): ?>
 <dialog class="app-dialog approval-confirm-dialog" id="approval-confirm-dialog" aria-labelledby="approval-confirm-title">
     <div class="approval-confirm-icon" aria-hidden="true">✓</div>
     <span class="eyebrow">KONFIRMASI PERSETUJUAN</span>
@@ -63,4 +68,5 @@ page_header('Persetujuan', 'approvals', $user, $pendingCount);
         <button class="button button-primary" type="button" data-approval-confirm-submit>Ya, setujui</button>
     </div>
 </dialog>
+<?php endif; ?>
 <?php page_footer(); ?>

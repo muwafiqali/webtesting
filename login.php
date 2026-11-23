@@ -33,16 +33,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Masuk · IzinKantor</title>
     <link rel="icon" href="assets/logo.png" type="image/png">
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem('izinkantor-theme');
+                if (theme === 'dark' || theme === 'light') document.documentElement.dataset.theme = theme;
+            } catch (e) {}
+        })();
+    </script>
     <link rel="stylesheet" href="assets/app.css">
-    <link rel="stylesheet" href="assets/login.css">
+    <link rel="stylesheet" href="assets/login.css?v=<?= (int) filemtime(__DIR__ . '/assets/login.css') ?>">
+    <script src="assets/theme.js?v=<?= (int) filemtime(__DIR__ . '/assets/theme.js') ?>" defer></script>
 </head>
 <body class="login-page">
     <main class="login-layout">
         <section class="login-visual" position="center">
-           
-            <a class="brand brand-on-dark" href="login.php"><img class="brand-logo" src="assets/logo.png" alt="Logo SEMESTA"></a>
+            <div class="brand-row login-brand-row">
+                <a class="brand brand-on-dark login-brand-lockup" href="login.php">
+                    <img class="brand-logo" src="assets/logo1.png" alt="Logo SEMESTA">
+                    <span class="brand-copy">
+                        <strong>PAMIT-LEK</strong>
+                        <small>Aplikasi Izin Keluar Kantor</small>
+                    </span>
+                </a>
+                <button class="theme-toggle theme-toggle-dark" type="button" data-theme-toggle aria-label="Ganti mode tampilan" title="Ganti mode tampilan"><span class="theme-icon" aria-hidden="true">☾</span></button>
+            </div>
             <div class="login-card">
-                <div class="login-mobile-brand brand"><img class="brand-logo" src="assets/logo.png" alt="Logo SEMESTA"></div>
+                <div class="login-mobile-brand brand">
+                    <img class="brand-logo" src="assets/logo1.png" alt="Logo PAMIT-LEK">
+                    <span class="brand-copy">
+                        <strong>PAMIT-LEK</strong>
+                        <small>Aplikasi Izin Keluar Kantor</small>
+                    </span>
+                </div>
                 <span class="eyebrow">SELAMAT DATANG</span>
                 <h2>Masuk ke akun Anda</h2>
                 <p class="muted">Gunakan NIP dan kata sandi yang terdaftar.</p>
@@ -58,9 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button class="button button-primary button-wide" type="submit">Masuk <span aria-hidden="true">→</span></button>
                 </form>
                 <div class="login-demo">
-                    <strong>Akun </strong>
-                    <p>NIip w12345678</p>
-                    <small>.....: <code>password</code></small>
+                    <strong>Butuh bantuan? </strong>
+                    <p>Hubungi administrator jika mengalami kendala.</p>
+                    
                 </div>
                 <p class="login-caption">Akses khusus untuk pegawai yang telah terdaftar.</p>
             </div>

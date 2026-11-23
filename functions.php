@@ -145,6 +145,53 @@ function time_id(?string $time): string
     return $time ? substr($time, 0, 5) : '-';
 }
 
+function time_picker(string $name, string $label, ?string $time = null, ?string $id = null): void
+{
+    $selectedHour = $time ? substr($time, 0, 2) : '';
+    $selectedMinute = $time ? substr($time, 3, 2) : '';
+    $pickerId = $id ?? $name;
+    ?>
+    <div class="time-picker-field" data-time-picker>
+        <span class="time-picker-label"><?= h($label) ?></span>
+        <input type="hidden" name="<?= h($name) ?>_hour" data-time-hour-value value="<?= h($selectedHour) ?>">
+        <input type="hidden" name="<?= h($name) ?>_minute" data-time-minute-value value="<?= h($selectedMinute) ?>">
+        <button class="time-picker-trigger" type="button" data-time-trigger aria-expanded="false" aria-controls="<?= h($pickerId) ?>-panel" aria-label="Pilih waktu <?= h($label) ?>">
+            <span class="time-picker-icon" aria-hidden="true">◷</span>
+            <span class="time-picker-value" data-time-display><?= $time ? h(time_id($time)) : 'Pilih waktu' ?></span>
+            <span class="time-picker-arrow" aria-hidden="true">⌄</span>
+        </button>
+        <div class="time-picker-panel" id="<?= h($pickerId) ?>-panel" data-time-panel role="group" aria-label="Pilih waktu <?= h($label) ?>" hidden>
+            <div class="time-picker-panel-heading">
+                <div><span class="time-picker-panel-kicker">PILIH WAKTU</span><strong>Format 24 jam</strong></div>
+                <div class="time-picker-heading-controls">
+                    <span class="time-picker-preview" data-time-preview><?= $time ? h(time_id($time)) : '--:--' ?></span>
+                    <button class="time-picker-close" type="button" data-time-close aria-label="Tutup pemilih waktu">×</button>
+                </div>
+            </div>
+            <div class="time-picker-columns">
+                <div class="time-picker-choice">
+                    <span>Jam</span>
+                    <div class="time-picker-options" data-time-hour-options role="listbox" aria-label="Jam <?= h($label) ?>">
+                        <?php for ($hour = 0; $hour <= 24; $hour++): $hourValue = sprintf('%02d', $hour); ?>
+                            <button class="time-picker-option" type="button" role="option" tabindex="-1" data-time-option="hour" data-value="<?= $hourValue ?>" aria-selected="<?= $hourValue === $selectedHour ? 'true' : 'false' ?>"><?= $hourValue ?></button>
+                        <?php endfor; ?>
+                    </div>
+                </div>
+                <div class="time-picker-choice">
+                    <span>Menit</span>
+                    <div class="time-picker-options" data-time-minute-options role="listbox" aria-label="Menit <?= h($label) ?>">
+                        <?php for ($minute = 0; $minute < 60; $minute++): $minuteValue = sprintf('%02d', $minute); ?>
+                            <button class="time-picker-option" type="button" role="option" tabindex="-1" data-time-option="minute" data-value="<?= $minuteValue ?>" aria-selected="<?= $minuteValue === $selectedMinute ? 'true' : 'false' ?>"><?= $minuteValue ?></button>
+                        <?php endfor; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <small class="time-picker-error" data-time-error hidden>Pilih jam dan menit terlebih dahulu.</small>
+    </div>
+    <?php
+}
+
 function date_long(): string
 {
     $days = [1 => 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
@@ -174,6 +221,14 @@ function page_header(string $title, string $active, array $user, int $pendingCou
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title><?= h($title) ?> · IzinKantor</title>
         <link rel="icon" href="assets/logo.png" type="image/png">
+        <script>
+            (function () {
+                try {
+                    var theme = localStorage.getItem('izinkantor-theme');
+                    if (theme === 'dark' || theme === 'light') document.documentElement.dataset.theme = theme;
+                } catch (e) {}
+            })();
+        </script>
         <link rel="stylesheet" href="assets/app.css?v=<?= (int) filemtime(__DIR__ . '/assets/app.css') ?>">
         <?php
         $pageStyles = [
@@ -192,14 +247,21 @@ function page_header(string $title, string $active, array $user, int $pendingCou
         <?php if ($active === 'users'): ?>
             <script src="assets/custom-select.js?v=<?= (int) filemtime(__DIR__ . '/assets/custom-select.js') ?>" defer></script>
         <?php endif; ?>
-        <?php if ($active === 'approvals'): ?>
+        <?php if ($active === 'requests'): ?>
+            <script src="assets/time-picker.js?v=<?= (int) filemtime(__DIR__ . '/assets/time-picker.js') ?>" defer></script>
+        <?php endif; ?>
+        <?php if ($active === 'approvals' && $user['role'] === 'kepala'): ?>
             <script src="assets/approvals.js?v=<?= (int) filemtime(__DIR__ . '/assets/approvals.js') ?>" defer></script>
         <?php endif; ?>
+        <script src="assets/theme.js?v=<?= (int) filemtime(__DIR__ . '/assets/theme.js') ?>" defer></script>
     </head>
     <body>
     <div class="app-shell">
         <aside class="sidebar">
-            <a class="brand" href="dashboard.php"><img class="brand-logo" src="assets/logo.png" alt="Logo SEMESTA"></a>
+            <div class="brand-row">
+                <a class="brand" href="dashboard.php"><img class="brand-logo" src="assets/logo1.png" alt="Logo SEMESTA"></a>
+                <button class="theme-toggle" type="button" data-theme-toggle aria-label="Ganti mode tampilan" title="Ganti mode tampilan"><span class="theme-icon" aria-hidden="true">☾</span></button>
+            </div>
             <div class="sidebar-label">MENU UTAMA</div>
             <nav class="side-nav">
                 <?php foreach ($menus as [$href, $label, $icon, $key]): ?>
