@@ -1,6 +1,6 @@
 # IzinKantor
 
-Portal internal pengajuan izin pegawai berbasis PHP dan MySQL/MariaDB. Alur persetujuan: **Pegawai → Ketua Tim → Kepala Kantor**.
+Portal internal pengajuan izin pegawai berbasis PHP dan MySQL/MariaDB. Alur persetujuan: **Pegawai → Ketua Tim → Kepala Kantor**; pengajuan Ketua Tim diteruskan langsung ke Kepala Kantor.
 
 ## Menjalankan di Laragon
 
@@ -29,8 +29,9 @@ Default koneksi untuk Laragon adalah host `127.0.0.1`, database `izin_pegawai`, 
 - Login dengan session dan password hash.
 - Dashboard ringkasan dengan cakupan data sesuai peran.
 - Pegawai dapat membuat pengajuan dan mengirim ulang pengajuan yang diminta perbaikannya.
+- Ketua Tim dapat mengajukan izin langsung ke Kepala Kantor dan mengirim ulang pengajuan yang diminta perbaikannya.
 - Pengajuan mencatat jam mulai dan selesai dalam format 00:00–24:00.
-- Ketua Tim hanya dapat memproses pengajuan anggota timnya; Kepala Kantor memproses pengajuan yang telah lolos tahap Ketua Tim.
+- Ketua Tim hanya dapat memproses pengajuan anggota timnya; Kepala Kantor memproses pengajuan yang telah lolos tahap Ketua Tim serta pengajuan pribadi Ketua Tim.
 - Setiap keputusan dicatat dalam riwayat persetujuan.
 - Admin dapat membuat dan mengedit akun, serta menonaktifkan atau mengaktifkan akses tanpa menghapus riwayat pengguna.
 - Pengguna dapat mengubah nama, email, alamat, dan kata sandi melalui menu Profil Saya.

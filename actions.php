@@ -69,8 +69,8 @@ $pdo = db();
 
 try {
     if ($action === 'create_request') {
-        if ($user['role'] !== 'pegawai') {
-            throw new InvalidArgumentException('Hanya pegawai yang dapat membuat pengajuan izin.');
+        if (!in_array($user['role'], ['pegawai', 'ketua_tim'], true)) {
+            throw new InvalidArgumentException('Hanya pegawai dan Ketua Tim yang dapat membuat pengajuan izin.');
         }
         [$typeId, $startDate, $endDate, $startTime, $endTime, $reason] = validate_request_fields();
         $typeCheck = $pdo->prepare('SELECT id FROM leave_types WHERE id = ? AND is_active = 1');
@@ -80,17 +80,20 @@ try {
         }
         ensure_no_overlap($pdo, (int) $user['id'], $startDate, $endDate);
         $code = 'IZ-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
+        $initialStatus = $user['role'] === 'ketua_tim' ? 'awaiting_head' : 'awaiting_team';
         $statement = $pdo->prepare(
             "INSERT INTO leave_requests (request_code, user_id, leave_type_id, start_date, end_date, start_time, end_time, reason, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'awaiting_team')"
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
-        $statement->execute([$code, $user['id'], $typeId, $startDate, $endDate, $startTime, $endTime, $reason]);
-        flash('success', 'Pengajuan izin berhasil dikirim ke Ketua Tim.');
+        $statement->execute([$code, $user['id'], $typeId, $startDate, $endDate, $startTime, $endTime, $reason, $initialStatus]);
+        flash('success', $user['role'] === 'ketua_tim'
+            ? 'Pengajuan izin berhasil dikirim ke Kepala Kantor.'
+            : 'Pengajuan izin berhasil dikirim ke Ketua Tim.');
         redirect('requests.php');
     }
 
     if ($action === 'resubmit_request') {
-        if ($user['role'] !== 'pegawai') {
+        if (!in_array($user['role'], ['pegawai', 'ketua_tim'], true)) {
             throw new InvalidArgumentException('Akses tidak diizinkan.');
         }
         $requestId = filter_var($_POST['request_id'] ?? null, FILTER_VALIDATE_INT);
@@ -111,16 +114,19 @@ try {
             throw new InvalidArgumentException('Pengajuan tidak ditemukan atau tidak sedang menunggu perbaikan.');
         }
         ensure_no_overlap($pdo, (int) $user['id'], $startDate, $endDate, (int) $requestId);
+        $resubmissionStatus = $user['role'] === 'ketua_tim' ? 'awaiting_head' : 'awaiting_team';
         $statement = $pdo->prepare(
             "UPDATE leave_requests
-             SET leave_type_id = ?, start_date = ?, end_date = ?, start_time = ?, end_time = ?, reason = ?, status = 'awaiting_team'
+             SET leave_type_id = ?, start_date = ?, end_date = ?, start_time = ?, end_time = ?, reason = ?, status = ?
              WHERE id = ? AND user_id = ? AND status = 'revision'"
         );
-        $statement->execute([$typeId, $startDate, $endDate, $startTime, $endTime, $reason, $requestId, $user['id']]);
+        $statement->execute([$typeId, $startDate, $endDate, $startTime, $endTime, $reason, $resubmissionStatus, $requestId, $user['id']]);
         if ($statement->rowCount() !== 1) {
             throw new InvalidArgumentException('Pengajuan berubah. Muat ulang halaman lalu coba kembali.');
         }
-        flash('success', 'Perbaikan berhasil dikirim kembali ke Ketua Tim.');
+        flash('success', $user['role'] === 'ketua_tim'
+            ? 'Perbaikan berhasil dikirim kembali ke Kepala Kantor.'
+            : 'Perbaikan berhasil dikirim kembali ke Ketua Tim.');
         redirect('requests.php');
     }
 

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/bootstrap.php';
 $user = require_login();
 $pdo = db();
+$canSubmitRequest = in_array($user['role'], ['pegawai', 'ketua_tim'], true);
 $perPage = 20;
 $page = max(1, (int) ($_GET['page'] ?? 1));
 $offset = ($page - 1) * $perPage;
@@ -60,12 +61,12 @@ if ($user['role'] === 'ketua_tim') {
 
 page_header('Pengajuan Izin', 'requests', $user, $pendingCount);
 ?>
-<div class="page-intro"><div><span class="eyebrow">MANAJEMEN IZIN</span><h2><?= $user['role'] === 'pegawai' ? 'Riwayat pengajuan' : 'Daftar pengajuan izin' ?></h2><p><?= $user['role'] === 'pegawai' ? 'Semua permohonan izin yang pernah Anda kirim.' : 'Pengajuan yang dapat Anda pantau sesuai akses peran.' ?></p></div><?php if ($user['role'] === 'pegawai'): ?><a class="button button-primary" href="#buat-pengajuan">+ Pengajuan baru</a><?php endif; ?></div>
+<div class="page-intro"><div><span class="eyebrow">MANAJEMEN IZIN</span><h2><?= $user['role'] === 'pegawai' ? 'Riwayat pengajuan' : 'Daftar pengajuan izin' ?></h2><p><?= $user['role'] === 'pegawai' ? 'Semua permohonan izin yang pernah Anda kirim.' : 'Pengajuan yang dapat Anda pantau sesuai akses peran.' ?></p></div><?php if ($canSubmitRequest): ?><a class="button button-primary" href="#buat-pengajuan">+ Pengajuan baru</a><?php endif; ?></div>
 
-<?php if ($user['role'] === 'pegawai'): ?>
+<?php if ($canSubmitRequest): ?>
 <section class="panel" id="buat-pengajuan">
     <div class="panel-heading"><div><span class="eyebrow">FORMULIR</span><h2>Ajukan izin baru</h2></div></div>
-    <p class="muted form-hint">Pengajuan akan dikirim ke Ketua Tim Anda untuk diperiksa terlebih dahulu.</p>
+    <p class="muted form-hint"><?= $user['role'] === 'ketua_tim' ? 'Pengajuan Anda akan dikirim langsung ke Kepala Kantor untuk diperiksa.' : 'Pengajuan akan dikirim ke Ketua Tim Anda untuk diperiksa terlebih dahulu.' ?></p>
     <form action="actions.php" method="post" class="request-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="create_request">
         <label>Jenis izin
@@ -104,7 +105,7 @@ page_header('Pengajuan Izin', 'requests', $user, $pendingCount);
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
-                <?php if ($user['role'] === 'pegawai' && $request['status'] === 'revision'): ?>
+                <?php if ($canSubmitRequest && (int) $request['user_id'] === (int) $user['id'] && $request['status'] === 'revision'): ?>
                     <details class="revision-editor"><summary>Perbaiki dan kirim ulang</summary>
                         <form action="actions.php" method="post" class="request-form">
                             <?= csrf_field() ?><input type="hidden" name="action" value="resubmit_request"><input type="hidden" name="request_id" value="<?= (int) $request['id'] ?>">
