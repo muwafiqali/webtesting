@@ -1,6 +1,6 @@
 # IzinKantor
 
-Portal internal pengajuan izin pegawai berbasis PHP dan MySQL/MariaDB. Alur persetujuan: **Pegawai → Ketua Tim → Kepala Kantor**; pengajuan Ketua Tim diteruskan langsung ke Kepala Kantor.
+Portal internal pengajuan izin pegawai berbasis PHP dan MySQL/MariaDB. Pengajuan pegawai kategori **Dinas** dikirim ke Ketua Tim pegawai tersebut, sedangkan kategori **Non-Dinas** langsung ke Ketua Tim pada tim **Tim Umum**. Setelah disetujui Ketua Tim, pengajuan diteruskan ke Kepala Kantor. Pengajuan Ketua Tim sendiri diteruskan langsung ke Kepala Kantor.
 
 ## Menjalankan di Laragon
 
@@ -9,7 +9,7 @@ Portal internal pengajuan izin pegawai berbasis PHP dan MySQL/MariaDB. Alur pers
 3. Buka `http://localhost/bpstrenggalek/`.
 4. Masuk menggunakan salah satu akun demo di bawah. Kata sandi seluruh akun demo adalah `password`.
 
-Untuk database yang sudah berjalan sebelum fitur profil dan jam pengajuan ditambahkan, jalankan sekali isi file `migrations/20261118_add_user_address.sql` dan `migrations/20261119_add_request_times.sql` pada database `izin_pegawai`.
+Untuk database yang sudah berjalan sebelum fitur profil, jam pengajuan, dan kategori routing izin ditambahkan, jalankan sekali file `migrations/20261118_add_user_address.sql`, `migrations/20261119_add_request_times.sql`, dan `migrations/20261126_add_leave_type_category.sql` pada database `izin_pegawai`.
 
 | Peran | Username |
 |---|---|
@@ -29,6 +29,7 @@ Default koneksi untuk Laragon adalah host `127.0.0.1`, database `izin_pegawai`, 
 - Login dengan session dan password hash.
 - Dashboard ringkasan dengan cakupan data sesuai peran.
 - Pegawai dapat membuat pengajuan dan mengirim ulang pengajuan yang diminta perbaikannya.
+- Routing pengajuan pegawai memakai kategori jenis izin di database: Dinas ke Ketua Timnya dan Non-Dinas ke Ketua Tim Umum.
 - Ketua Tim dapat mengajukan izin langsung ke Kepala Kantor dan mengirim ulang pengajuan yang diminta perbaikannya.
 - Pengajuan mencatat jam mulai dan selesai dalam format 00:00–24:00.
 - Ketua Tim hanya dapat memproses pengajuan anggota timnya; Kepala Kantor memproses pengajuan yang telah lolos tahap Ketua Tim serta pengajuan pribadi Ketua Tim.

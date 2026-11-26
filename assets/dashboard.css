@@ -89,6 +89,105 @@
     margin: 20px 0;
 }
 
+.dashboard-filter-panel {
+    margin-top: 20px;
+}
+
+.dashboard-filter-form {
+    gap: 16px;
+}
+
+.dashboard-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 14px;
+}
+
+.dashboard-name-field {
+    display: grid;
+    align-content: start;
+    gap: 6px;
+}
+
+.dashboard-name-field > label {
+    color: #46556b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.dashboard-filter-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.dashboard-name-suggest {
+    position: relative;
+}
+
+.dashboard-name-suggest-popup {
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 0;
+    left: 0;
+    z-index: 20;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(23,43,77,.14);
+}
+
+.dashboard-name-suggest-popup[hidden] {
+    display: none;
+}
+
+.dashboard-name-suggest-options {
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.dashboard-name-suggest-option {
+    display: block;
+    width: 100%;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dashboard-name-suggest-option[hidden] {
+    display: none;
+}
+
+.dashboard-name-suggest-option:hover,
+.dashboard-name-suggest-option[aria-selected="true"] {
+    background: #edf3ff;
+    color: var(--blue);
+}
+
+.dashboard-name-suggest-empty {
+    margin: 0;
+    padding: 10px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+:root[data-theme="dark"] .dashboard-name-suggest-popup {
+    background: #192438;
+}
+
+:root[data-theme="dark"] .dashboard-name-suggest-option:hover,
+:root[data-theme="dark"] .dashboard-name-suggest-option[aria-selected="true"] {
+    background: #263b5d;
+    color: #9dbcf8;
+}
+
 .stat-card {
     position: relative;
     min-height: 111px;
@@ -166,6 +265,20 @@
 }
 
 @media (max-width: 760px) {
+    .dashboard-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-filter-form .form-actions,
+    .dashboard-filter-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .dashboard-filter-actions .button {
+        justify-content: center;
+    }
+
     .welcome-banner {
         padding: 23px 20px;
         min-height: 145px;

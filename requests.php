@@ -50,14 +50,7 @@ if ($requests) {
 }
 
 $types = $pdo->query('SELECT id, name FROM leave_types WHERE is_active = 1 ORDER BY name')->fetchAll();
-$pendingCount = 0;
-if ($user['role'] === 'ketua_tim') {
-    $pending = $pdo->prepare("SELECT COUNT(*) FROM leave_requests r JOIN users u ON u.id = r.user_id WHERE u.team_id = ? AND r.status = 'awaiting_team'");
-    $pending->execute([$user['team_id']]);
-    $pendingCount = (int) $pending->fetchColumn();
-} elseif ($user['role'] === 'kepala') {
-    $pendingCount = (int) $pdo->query("SELECT COUNT(*) FROM leave_requests WHERE status = 'awaiting_head'")->fetchColumn();
-}
+$pendingCount = pending_approval_count($pdo, $user);
 
 page_header('Pengajuan Izin', 'requests', $user, $pendingCount);
 ?>
@@ -66,7 +59,7 @@ page_header('Pengajuan Izin', 'requests', $user, $pendingCount);
 <?php if ($canSubmitRequest): ?>
 <section class="panel" id="buat-pengajuan">
     <div class="panel-heading"><div><span class="eyebrow">FORMULIR</span><h2>Ajukan izin baru</h2></div></div>
-    <p class="muted form-hint"><?= $user['role'] === 'ketua_tim' ? 'Pengajuan Anda akan dikirim langsung ke Kepala Kantor untuk diperiksa.' : 'Pengajuan akan dikirim ke Ketua Tim Anda untuk diperiksa terlebih dahulu.' ?></p>
+    <p class="muted form-hint"><?= $user['role'] === 'ketua_tim' ? 'Pengajuan Anda akan dikirim langsung ke Kepala Kantor untuk diperiksa.' : 'Pengajuan Dinas dikirim ke Ketua Tim Anda. Pengajuan Non-Dinas langsung dikirim ke Ketua Tim Umum.' ?></p>
     <form action="actions.php" method="post" class="request-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="create_request">
         <label>Jenis izin

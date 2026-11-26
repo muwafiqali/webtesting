@@ -73,10 +73,14 @@ try {
             throw new InvalidArgumentException('Hanya pegawai dan Ketua Tim yang dapat membuat pengajuan izin.');
         }
         [$typeId, $startDate, $endDate, $startTime, $endTime, $reason] = validate_request_fields();
-        $typeCheck = $pdo->prepare('SELECT id FROM leave_types WHERE id = ? AND is_active = 1');
+        $typeCheck = $pdo->prepare('SELECT id, category FROM leave_types WHERE id = ? AND is_active = 1');
         $typeCheck->execute([$typeId]);
-        if (!$typeCheck->fetchColumn()) {
+        $leaveType = $typeCheck->fetch();
+        if (!$leaveType) {
             throw new InvalidArgumentException('Jenis izin yang dipilih tidak tersedia.');
+        }
+        if ($user['role'] === 'pegawai' && $leaveType['category'] === 'non_dinas') {
+            require_general_team_approver($pdo);
         }
         ensure_no_overlap($pdo, (int) $user['id'], $startDate, $endDate);
         $code = 'IZ-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
@@ -101,10 +105,14 @@ try {
             throw new InvalidArgumentException('Pengajuan tidak valid.');
         }
         [$typeId, $startDate, $endDate, $startTime, $endTime, $reason] = validate_request_fields();
-        $typeCheck = $pdo->prepare('SELECT id FROM leave_types WHERE id = ? AND is_active = 1');
+        $typeCheck = $pdo->prepare('SELECT id, category FROM leave_types WHERE id = ? AND is_active = 1');
         $typeCheck->execute([$typeId]);
-        if (!$typeCheck->fetchColumn()) {
+        $leaveType = $typeCheck->fetch();
+        if (!$leaveType) {
             throw new InvalidArgumentException('Jenis izin yang dipilih tidak tersedia.');
+        }
+        if ($user['role'] === 'pegawai' && $leaveType['category'] === 'non_dinas') {
+            require_general_team_approver($pdo);
         }
         $ownerCheck = $pdo->prepare(
             "SELECT id FROM leave_requests WHERE id = ? AND user_id = ? AND status = 'revision'"
@@ -146,8 +154,9 @@ try {
 
         $pdo->beginTransaction();
         $statement = $pdo->prepare(
-            'SELECT r.id, r.status, u.team_id
+            'SELECT r.id, r.status, u.team_id, lt.category
              FROM leave_requests r JOIN users u ON u.id = r.user_id
+             JOIN leave_types lt ON lt.id = r.leave_type_id
              WHERE r.id = ? FOR UPDATE'
         );
         $statement->execute([$requestId]);
@@ -156,8 +165,19 @@ try {
         if (!$request || $request['status'] !== $expectedStatus) {
             throw new InvalidArgumentException('Pengajuan tidak ditemukan atau sudah diproses.');
         }
-        if ($user['role'] === 'ketua_tim' && (int) $request['team_id'] !== (int) $user['team_id']) {
-            throw new InvalidArgumentException('Pengajuan ini bukan milik tim Anda.');
+        if ($user['role'] === 'ketua_tim') {
+            if ($request['category'] === 'dinas') {
+                if ((int) $request['team_id'] !== (int) $user['team_id']) {
+                    throw new InvalidArgumentException('Pengajuan Dinas ini bukan milik tim Anda.');
+                }
+            } elseif ($request['category'] === 'non_dinas') {
+                $generalTeamId = general_team_id($pdo);
+                if ($generalTeamId === null || (int) $user['team_id'] !== $generalTeamId) {
+                    throw new InvalidArgumentException('Pengajuan Non-Dinas hanya dapat diproses oleh Ketua Tim Umum.');
+                }
+            } else {
+                throw new InvalidArgumentException('Kategori jenis izin tidak valid.');
+            }
         }
 
         if ($decision === 'approved') {

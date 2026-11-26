@@ -4,19 +4,20 @@ $user = require_role(['ketua_tim', 'kepala']);
 $pdo = db();
 
 if ($user['role'] === 'ketua_tim') {
+    $generalTeamId = general_team_id($pdo);
+    $isGeneralTeam = $generalTeamId !== null && (int) $user['team_id'] === $generalTeamId;
     $query = $pdo->prepare(
         "SELECT r.*, lt.name AS type_name, u.name AS employee_name, u.nip,
                 t.name AS team_name
          FROM leave_requests r JOIN leave_types lt ON lt.id = r.leave_type_id
          JOIN users u ON u.id = r.user_id LEFT JOIN teams t ON t.id = u.team_id
-         WHERE r.status = 'awaiting_team' AND u.team_id = ?
+         WHERE r.status = 'awaiting_team'
+           AND ((lt.category = 'dinas' AND u.team_id = ?)
+                OR (lt.category = 'non_dinas' AND ? = 1))
          ORDER BY r.created_at ASC LIMIT 100"
     );
-    $query->execute([$user['team_id']]);
-    $stage = 'Ketua Tim';
-    $pendingCountQuery = $pdo->prepare("SELECT COUNT(*) FROM leave_requests r JOIN users u ON u.id = r.user_id WHERE r.status = 'awaiting_team' AND u.team_id = ?");
-    $pendingCountQuery->execute([$user['team_id']]);
-    $pendingCount = (int) $pendingCountQuery->fetchColumn();
+    $query->execute([$user['team_id'], $isGeneralTeam ? 1 : 0]);
+    $stage = $isGeneralTeam ? 'Ketua Tim / Ketua Tim Umum' : 'Ketua Tim';
 } else {
     $query = $pdo->query(
         "SELECT r.*, lt.name AS type_name, u.name AS employee_name, u.nip,
@@ -27,8 +28,8 @@ if ($user['role'] === 'ketua_tim') {
          ORDER BY r.created_at ASC LIMIT 100"
     );
     $stage = 'Kepala Kantor';
-    $pendingCount = (int) $pdo->query("SELECT COUNT(*) FROM leave_requests WHERE status = 'awaiting_head'")->fetchColumn();
 }
+$pendingCount = pending_approval_count($pdo, $user);
 $requests = $query->fetchAll();
 page_header('Persetujuan', 'approvals', $user, $pendingCount);
 ?>

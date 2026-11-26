@@ -80,6 +80,58 @@ function require_role(array $roles): array
     return $user;
 }
 
+function general_team_id(PDO $pdo): ?int
+{
+    $statement = $pdo->query("SELECT id FROM teams WHERE LOWER(TRIM(name)) = 'tim umum' LIMIT 2");
+    $teamIds = $statement->fetchAll(PDO::FETCH_COLUMN);
+    if (count($teamIds) > 1) {
+        throw new RuntimeException('Nama tim "Tim Umum" harus unik untuk routing pengajuan Non-Dinas.');
+    }
+    return isset($teamIds[0]) ? (int) $teamIds[0] : null;
+}
+
+function require_general_team_approver(PDO $pdo): void
+{
+    $generalTeamId = general_team_id($pdo);
+    if ($generalTeamId === null) {
+        throw new InvalidArgumentException('Tim Umum belum dikonfigurasi sebagai tujuan pengajuan Non-Dinas.');
+    }
+
+    $statement = $pdo->prepare(
+        "SELECT id FROM users WHERE role = 'ketua_tim' AND team_id = ? AND is_active = 1 LIMIT 1"
+    );
+    $statement->execute([$generalTeamId]);
+    if (!$statement->fetchColumn()) {
+        throw new InvalidArgumentException('Ketua Tim Umum belum memiliki akun aktif.');
+    }
+}
+
+function pending_approval_count(PDO $pdo, array $user): int
+{
+    if ($user['role'] === 'ketua_tim') {
+        $generalTeamId = general_team_id($pdo);
+        $isGeneralTeam = $generalTeamId !== null && (int) $user['team_id'] === $generalTeamId;
+        $statement = $pdo->prepare(
+            "SELECT COUNT(*) FROM leave_requests r
+             JOIN leave_types lt ON lt.id = r.leave_type_id
+             JOIN users u ON u.id = r.user_id
+             WHERE r.status = 'awaiting_team'
+               AND ((lt.category = 'dinas' AND u.team_id = ?)
+                    OR (lt.category = 'non_dinas' AND ? = 1))"
+        );
+        $statement->execute([$user['team_id'], $isGeneralTeam ? 1 : 0]);
+        return (int) $statement->fetchColumn();
+    }
+
+    if ($user['role'] === 'kepala') {
+        return (int) $pdo->query(
+            "SELECT COUNT(*) FROM leave_requests WHERE status = 'awaiting_head'"
+        )->fetchColumn();
+    }
+
+    return 0;
+}
+
 function flash(string $key, ?string $message = null): ?string
 {
     if ($message !== null) {
@@ -246,6 +298,9 @@ function page_header(string $title, string $active, array $user, int $pendingCou
         <?php endif; ?>
         <?php if ($active === 'users'): ?>
             <script src="assets/custom-select.js?v=<?= (int) filemtime(__DIR__ . '/assets/custom-select.js') ?>" defer></script>
+        <?php endif; ?>
+        <?php if ($active === 'dashboard' && in_array($user['role'], ['admin', 'kepala'], true)): ?>
+            <script src="assets/name-suggest.js?v=<?= (int) filemtime(__DIR__ . '/assets/name-suggest.js') ?>" defer></script>
         <?php endif; ?>
         <?php if ($active === 'requests'): ?>
             <script src="assets/time-picker.js?v=<?= (int) filemtime(__DIR__ . '/assets/time-picker.js') ?>" defer></script>

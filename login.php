@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <form method="post" class="form-stack">
                     <?= csrf_field() ?>
                     <label>NIP
-                        <input type="text" name="nip" inputmode="numeric" autocomplete="username" pattern="[0-9]+" placeholder="Masukkan NIP" required autofocus>
+                        <input type="text" name="nip" inputmode="numeric" autocomplete="username" pattern="[a-zA-Z0-9]+" placeholder="Masukkan NIP" required autofocus>
                     </label>
                     <label>Kata sandi
                         <input type="password" name="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required>
