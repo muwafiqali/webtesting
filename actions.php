@@ -90,9 +90,12 @@ try {
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $statement->execute([$code, $user['id'], $typeId, $startDate, $endDate, $startTime, $endTime, $reason, $initialStatus]);
-        flash('success', $user['role'] === 'ketua_tim'
+        $successMessage = $user['role'] === 'ketua_tim'
             ? 'Pengajuan izin berhasil dikirim ke Kepala Kantor.'
-            : 'Pengajuan izin berhasil dikirim ke Ketua Tim.');
+            : ($leaveType['category'] === 'non_dinas'
+                ? 'Pengajuan izin berhasil dikirim ke Ketua Tim Umum.'
+                : 'Pengajuan izin berhasil dikirim ke Ketua Tim.');
+        flash('success', $successMessage);
         redirect('requests.php');
     }
 
@@ -132,9 +135,12 @@ try {
         if ($statement->rowCount() !== 1) {
             throw new InvalidArgumentException('Pengajuan berubah. Muat ulang halaman lalu coba kembali.');
         }
-        flash('success', $user['role'] === 'ketua_tim'
+        $successMessage = $user['role'] === 'ketua_tim'
             ? 'Perbaikan berhasil dikirim kembali ke Kepala Kantor.'
-            : 'Perbaikan berhasil dikirim kembali ke Ketua Tim.');
+            : ($leaveType['category'] === 'non_dinas'
+                ? 'Perbaikan berhasil dikirim kembali ke Ketua Tim Umum.'
+                : 'Perbaikan berhasil dikirim kembali ke Ketua Tim.');
+        flash('success', $successMessage);
         redirect('requests.php');
     }
 
@@ -181,7 +187,9 @@ try {
         }
 
         if ($decision === 'approved') {
-            $nextStatus = $user['role'] === 'ketua_tim' ? 'awaiting_head' : 'approved';
+            $nextStatus = $user['role'] === 'ketua_tim'
+                ? ($request['category'] === 'non_dinas' ? 'approved' : 'awaiting_head')
+                : 'approved';
         } else {
             $nextStatus = $decision;
         }
@@ -194,7 +202,10 @@ try {
             'INSERT INTO approval_logs (request_id, approver_id, stage, decision, note)
              VALUES (?, ?, ?, ?, ?)'
         );
-        $log->execute([$requestId, $user['id'], $user['role'], $decision, $note ?: null]);
+        $stage = $user['role'] === 'ketua_tim' && $request['category'] === 'non_dinas'
+            ? 'kasubag_umum'
+            : $user['role'];
+        $log->execute([$requestId, $user['id'], $stage, $decision, $note ?: null]);
         $pdo->commit();
         flash('success', 'Keputusan berhasil disimpan.');
         redirect('approvals.php');

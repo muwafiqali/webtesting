@@ -102,7 +102,7 @@ function require_general_team_approver(PDO $pdo): void
     );
     $statement->execute([$generalTeamId]);
     if (!$statement->fetchColumn()) {
-        throw new InvalidArgumentException('Ketua Tim Umum belum memiliki akun aktif.');
+        throw new InvalidArgumentException('Akun Ketua Tim Umum belum aktif.');
     }
 }
 
